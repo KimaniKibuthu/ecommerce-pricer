@@ -40,6 +40,8 @@ This branch contains the modularized code and the implementation of the fastapi 
 |-- streamlit_app.py
 ```
 
+NOTE: The data folder will not be present in the repo. The one above is in place so as to showcase the immplementation of the database.
+
 ## Usage
 
 The `notebooks` folder contains the `agents.ipynb` notebook which is used for experimentation with the agents.
