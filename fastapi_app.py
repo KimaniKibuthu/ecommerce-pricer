@@ -1,6 +1,7 @@
 import os
 import json
 import base64
+import uvicorn
 from PIL import Image
 from io import BytesIO
 from fastapi import FastAPI, Request
@@ -36,16 +37,18 @@ agent = Agent(
 # Initialize the agent
 agent_executor = agent.initialize()
 
-# Set up the components for the search logic
+# Set up the vision llm
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 gemini_vision = ChatGoogleGenerativeAI(
     model="gemini-pro-vision",
     google_api_key=GOOGLE_API_KEY,
     temperature=config["agents"]["temperature"],
 )
+
+# Create output parser for the vision llms output
 parser = JsonOutputParser()
 
-
+# Set up endpoint
 @app.post("/invoke")
 async def generate_price_range(request: Request) -> dict:
     """
@@ -93,7 +96,7 @@ async def generate_price_range(request: Request) -> dict:
 
             response = agent_executor.invoke(
                 {
-                    "input": f"what is the estimated, accurate and compact price range of a/an {search_prompt}. Return ONLY the price range"
+                    "input": f"what is the estimated, accurate and compact price range of a/an {search_prompt}?"
                 }
             )
             output_str = response["output"]
@@ -102,29 +105,28 @@ async def generate_price_range(request: Request) -> dict:
                 # Try parsing the response as JSON
                 price_dict = json.loads(output_str)
                 price_range = price_dict.get("price_range")
-                if price_range:
-                    return {"price_range": price_range}
+                reason = price_dict.get("reason")
+                if price_range and reason:
+                    return {"price_range": price_range, "reason": reason}
                 else:
                     return {"error": "Price range not found in response"}
 
             except json.JSONDecodeError:
-                # If parsing as JSON fails, check if the response is a string
-                if isinstance(output_str, str):
-                    return {"price_range": output_str}
-                else:
-                    # If not a string, try to extract the substring containing the dictionary
-                    start_index = output_str.find("{")
-                    end_index = output_str.find("}") + 1
-                    price_range_str = output_str[start_index:end_index]
-                    try:
-                        price_dict = json.loads(price_range_str)
-                        price_range = price_dict.get("price_range")
-                        if price_range:
-                            return {"price_range": price_range}
-                        else:
-                            return {"error": "Price range not found in response"}
-                    except json.JSONDecodeError:
-                        return {"error": "Unable to parse price range from response"}
+
+                # try to extract the substring containing the dictionary
+                start_index = output_str.find("{")
+                end_index = output_str.find("}") + 1
+                price_range_str = output_str[start_index:end_index]
+                try:
+                    price_dict = json.loads(price_range_str)
+                    price_range = price_dict.get("price_range")
+                    reason = price_dict.get("reason")
+                    if price_range:
+                        return {"price_range": price_range, "reason": reason}
+                    else:
+                        return {"error": "Price range not found in response"}
+                except json.JSONDecodeError:
+                    return {"error": "Unable to parse price range from response"}
 
         else:
             logger.error(
@@ -138,6 +140,5 @@ async def generate_price_range(request: Request) -> dict:
 
 
 if __name__ == "__main__":
-    import uvicorn
 
     uvicorn.run(app, host=config["fastapi"]["host"], port=config["fastapi"]["port"])

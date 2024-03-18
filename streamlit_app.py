@@ -4,7 +4,7 @@ import base64
 import asyncio
 import aiohttp
 import random
-import json
+import re
 
 
 async def fetch_data(url, payload):
@@ -15,31 +15,21 @@ async def fetch_data(url, payload):
 
 async def process_response(url, payload):
     try:
-        response = await fetch_data(url, payload)
-        if isinstance(response, dict):
-            try:
-                price_range = response.get("price_range")
-                if price_range:
-                    if "</s>" in price_range:
-                        # Case 1: Price range contains "<s>"
-                        temp_price_range = price_range.split("</s>")[0]
-                        price_range = json.loads(temp_price_range).get(
-                            "price_range", ""
-                        )
-                    elif '"' in price_range:
-                        # Case 2: Price range is enclosed in double quotes
-                        price_range = json.loads(price_range).get("price_range", "")
-                    # Format and display the price range
-                    price_range = price_range.replace("−", "-")
-                    st.success(f"**Price Range in Dollars:**  {price_range}")
-                else:
-                    st.write("Price range not found in response")
-            except Exception as e:
-                st.write(f"Error processing response: {e}")
-        else:
-            st.write("Invalid response format")
+        # response = await fetch_data(url, payload)
+        response = {
+            "price_range": "179.00-279.00",
+            "reason": "The price range for the Bose QuietComfort 45 wireless noise cancelling headphones is from $179.00 to $279.00. This price range is based on the prices found on the Bose website and Best Buy. The lower price of $179.00 is for a refurbished model, while the higher price of $279.00 is for a new model in white smoke. The off-white color may not be available for all models, which could affect the price.",
+        }
+        price_range = response.get("price_range")
+        reason = response.get("reason")
+        cleaned_reason = re.sub(r"[\x00-\x1F\x7F-\x9F]", "", reason, flags=re.UNICODE)
+        cleaned_response = re.sub(r"[^\w\s.,?!]", "", cleaned_reason)
+        with st.container(height=200):
+            st.success(f"The **Price Range (In Dollars)** is  {price_range}")
+            st.markdown(f"{cleaned_response}")
+
     except Exception as e:
-        st.write(f"Error processing response: {e}")
+        st.error(f"Error processing response: {e}")
 
 
 def main() -> None:
@@ -55,10 +45,8 @@ def main() -> None:
     )
 
     st.title("Price Range Generator 🧠")
-
-    st.info(
-        "An app that takes in the product image and the description and outouts a price range",
-        icon="💰",
+    st.caption(
+        "💰 An app that takes in the product image and the description and outouts a price range"
     )
 
     spinner_messages = [

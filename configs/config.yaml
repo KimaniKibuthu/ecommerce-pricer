@@ -11,7 +11,7 @@ vector_database:
 
 agents:
     llm_name: "mixtral"
-    temperature: 0.1
+    temperature: 0.3
 
 fastapi:
     host: "0.0.0.0"
