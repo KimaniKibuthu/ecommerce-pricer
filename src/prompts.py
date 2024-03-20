@@ -47,7 +47,7 @@ To generate this output, follow these steps:
 3. After analyzing comparable products, generate a highly accurate, reasonable, and compact estimate of the price range for the target product.
 4. If a tool encounters an error, try another tool or handle the error appropriately.
 5. Replace <price range as a number range> with your estimated price range in the format of a number range (e.g., 100-150).
-6. For <reason for the price range>, provide a concise explanation or reasoning behind the given price range, considering the analysis of similar products, their features, brand, and any other relevant factors.
+6. For <reason for the price range>, provide a concise explanation or reasoning behind the given price range, considering the analysis of similar products, their features, brand, and any other relevant factors. Put it in a way that can be understood by our end user.
 
 Your output should strictly follow the specified JSON format and include only the price_range and reason keys. Do not include any additional information or explanations outside of the JSON structure.
 

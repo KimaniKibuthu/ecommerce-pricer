@@ -5,6 +5,9 @@ import asyncio
 import aiohttp
 import random
 import re
+from src.utils import load_config
+
+config = load_config()
 
 
 async def fetch_data(url, payload):
@@ -15,11 +18,11 @@ async def fetch_data(url, payload):
 
 async def process_response(url, payload):
     try:
-        # response = await fetch_data(url, payload)
-        response = {
-            "price_range": "179.00-279.00",
-            "reason": "The price range for the Bose QuietComfort 45 wireless noise cancelling headphones is from $179.00 to $279.00. This price range is based on the prices found on the Bose website and Best Buy. The lower price of $179.00 is for a refurbished model, while the higher price of $279.00 is for a new model in white smoke. The off-white color may not be available for all models, which could affect the price.",
-        }
+        response = await fetch_data(url, payload)
+        # response = {
+        #     "price_range": "179.00-279.00",
+        #     "reason": "The price range for the Bose QuietComfort 45 wireless noise cancelling headphones is from $179.00 to $279.00. This price range is based on the prices found on the Bose website and Best Buy. The lower price of $179.00 is for a refurbished model, while the higher price of $279.00 is for a new model in white smoke. The off-white color may not be available for all models, which could affect the price.",
+        # }
         price_range = response.get("price_range")
         reason = response.get("reason")
         cleaned_reason = re.sub(r"[\x00-\x1F\x7F-\x9F]", "", reason, flags=re.UNICODE)
@@ -67,7 +70,7 @@ def main() -> None:
     user_text = st.text_input("Enter product description")
 
     if uploaded_image and user_text:
-        with st.container(height=300):
+        with st.container(height=350):
             image = PIL.Image.open(uploaded_image)
             st.image(image, caption=user_text, use_column_width=True)
 
@@ -78,7 +81,7 @@ def main() -> None:
             encoded_image_str = base64.b64encode(bytes_data).decode("utf-8")
             asyncio.run(
                 process_response(
-                    "http://localhost:8000/invoke",
+                    config["streamlit_app"]["endpoint_url"],
                     {"user_text": user_text, "image": encoded_image_str},
                 )
             )

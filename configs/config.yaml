@@ -4,15 +4,18 @@ vector_database:
     db_directory: "db"
     existing_text_db_directory: "data/databases/clip_textdb"
     existing_image_db_directory: "data/databases/image_db"
-    image_collection_name: "Image_Store"
-    text_collection_name: "Text_Store"
-    is_remote: False
-    url: None
+    image_collection_name: "img-collection"
+    text_collection_name: "apparel-collection"
+    is_remote: True
+    url: "https://1883d972-3d1a-4e6d-a846-86b9952741cd.us-east4-0.gcp.cloud.qdrant.io/:6333"
 
 agents:
     llm_name: "mixtral"
-    temperature: 0.3
+    temperature: 0.1
 
 fastapi:
     host: "0.0.0.0"
     port: 8000
+
+streamlit_app:
+    endpoint_url: "http://localhost:8000/invoke"

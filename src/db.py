@@ -3,13 +3,10 @@ Module instantiating the db
 """
 
 # Import the necessary libraries
-import os
-from typing import Union, Optional
-from dotenv import load_dotenv
-import chromadb
-from src.utils import logger, load_config
-from langchain_community.vectorstores import Chroma
-from langchain_experimental.open_clip import OpenCLIPEmbeddings
+from typing import Union, Optional, Any
+from qdrant_client import QdrantClient
+from src.utils import logger
+from langchain_community.vectorstores import Chroma, Qdrant
 
 # Instantiate DB class
 class VectorStore:
@@ -35,7 +32,7 @@ class VectorStore:
 
     def __init__(
         self,
-        persist_directory: str,
+        persist_directory: Optional[str],
         embedding_function: callable,
         collection_name: str,
         remote: bool,
@@ -49,7 +46,7 @@ class VectorStore:
         self.url = url
         self.api_key = api_key
 
-    def instantiate(self) -> Chroma:
+    def instantiate(self) -> Any:
         """
         Instantiate a Chroma vector store.
 
@@ -71,13 +68,14 @@ class VectorStore:
             )
             return db
         else:
-            client = chromadb.HttpClient(url=self.url, api_key=self.api_key)
-            db = Chroma(
+            client = QdrantClient(self.url, api_key=self.api_key)
+
+            db = Qdrant(
                 client=client,
                 collection_name=self.collection_name,
-                embedding_function=self.embedding_function,
+                embeddings=self.embedding_function,
             )
-            return db
+            return client, db
 
     def add_data(self, db: Chroma, data: Union[list, str], data_type: str) -> None:
         """
@@ -106,36 +104,3 @@ class VectorStore:
         """
         logger.info("Creating retriever from the vector store")
         return db.as_retriever()
-
-
-if __name__ == "__main__":
-    # Load configuration
-    config = load_config()
-    load_dotenv()
-
-    # Instantiate the OpenCLIP embeddings
-    open_clip_embeddings = OpenCLIPEmbeddings(
-        model_name=config["vector_database"]["embedding_model_name"],
-        checkpoint=config["vector_database"]["embedding_model_checkpoint"],
-    )
-
-    # Instantiate the VectorStore
-    vector_store = VectorStore(
-        persist_directory=config["vector_database"]["existing_text_db_directory"],
-        embedding_function=open_clip_embeddings,
-        collection_name=config["vector_database"]["text_collection_name"],
-        remote=config["vector_database"]["is_remote"],
-        url=config["vector_database"]["url"],
-        api_key=os.getenv("VECTORSTORE_API_KEY"),
-    )
-
-    # Instantiate the Chroma vector store
-    db = vector_store.instantiate()
-
-    # Create a retriever from the vector store
-    retriever = vector_store.create_retriever(db)
-
-    # Example usage of the retriever
-    query = "heels for women"
-    results = retriever.get_relevant_documents(query)
-    print(results)
