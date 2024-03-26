@@ -58,6 +58,8 @@ langgraph = "^0.0.26"
 pyowm = "^3.3.0"
 pre-commit = "^3.6.2"
 sentence-transformers = "^2.5.1"
+evaluate = "^0.4.1"
+rouge-score = "^0.1.2"
 
 [build-system]
 requires = ["poetry-core"]
