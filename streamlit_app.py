@@ -1,3 +1,7 @@
+"""
+Contains the Streamlit app
+"""
+
 import streamlit as st
 import PIL
 import base64
@@ -19,10 +23,6 @@ async def fetch_data(url, payload):
 async def process_response(url, payload):
     try:
         response = await fetch_data(url, payload)
-        # response = {
-        #     "price_range": "179.00-279.00",
-        #     "reason": "The price range for the Bose QuietComfort 45 wireless noise cancelling headphones is from $179.00 to $279.00. This price range is based on the prices found on the Bose website and Best Buy. The lower price of $179.00 is for a refurbished model, while the higher price of $279.00 is for a new model in white smoke. The off-white color may not be available for all models, which could affect the price.",
-        # }
         price_range = response.get("price_range")
         reason = response.get("reason")
         cleaned_reason = re.sub(r"[\x00-\x1F\x7F-\x9F]", "", reason, flags=re.UNICODE)

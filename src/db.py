@@ -6,7 +6,7 @@ Module instantiating the db
 from typing import Union, Optional, Any
 from qdrant_client import QdrantClient
 from src.utils import logger
-from langchain_community.vectorstores import Chroma, Qdrant
+from langchain_community.vectorstores import Chroma
 
 # Instantiate DB class
 class VectorStore:
@@ -70,12 +70,7 @@ class VectorStore:
         else:
             client = QdrantClient(self.url, api_key=self.api_key)
 
-            db = Qdrant(
-                client=client,
-                collection_name=self.collection_name,
-                embeddings=self.embedding_function,
-            )
-            return client, db
+            return client
 
     def add_data(self, db: Chroma, data: Union[list, str], data_type: str) -> None:
         """

@@ -1,3 +1,7 @@
+"""
+Contains the FastAPI app
+"""
+
 import os
 import json
 import base64

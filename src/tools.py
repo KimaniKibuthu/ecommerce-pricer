@@ -1,3 +1,7 @@
+"""
+Contains tools to be used by the agent
+"""
+
 import os
 from typing import List, Optional, Type
 from dotenv import load_dotenv
