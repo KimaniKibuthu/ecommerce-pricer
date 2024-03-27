@@ -1,33 +1,23 @@
-# Variables
-REGISTRY_URL=kimani007
-IMAGE_NAME=price-discovery
-IMAGE_TAG=latest
-CONTAINER_NAME=price-discovery-container
-
-# Build the Docker image
+# Build Docker images using docker-compose
 build:
-	docker build -t $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG) .
+	docker-compose build
 
-# Push the Docker image to the registry
+# Push Docker images to the registry using docker-compose
 push:
-	docker push $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker-compose push
 
-# Pull the Docker image from the registry
+# Pull Docker images from the registry using docker-compose
 pull:
-	docker pull $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker-compose pull
 
-# Run the Docker container
+# Run the Docker containers using docker-compose
 run:
-	docker run -p 8000:8000 -p 8501:8501 \
-		--env-file .env \
-		--name $(CONTAINER_NAME) \
-		$(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker-compose up -d
 
-# Stop and remove the Docker container
+# Stop and remove the Docker containers using docker-compose
 stop:
-	docker stop $(CONTAINER_NAME)
-	docker rm $(CONTAINER_NAME)
+	docker-compose down
 
-# Remove the Docker image
+# Remove the Docker images using docker-compose
 clean:
-	docker rmi $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG)
+	docker-compose down --rmi all

@@ -49,7 +49,7 @@ For more information, see the [documentation](https://www.notion.so/Price-Discov
     |-- utils.py
 
 |-- test_data
-    |-- 51RE0DBn5VL._AC_SL1500_.jpg
+    |-- headphones.jpg
     |-- README_images
 
 |-- poetry.lock
@@ -57,7 +57,9 @@ For more information, see the [documentation](https://www.notion.so/Price-Discov
 |-- pyproject.toml
 |-- fastapi_app.py
 |-- streamlit_app.py
-|-- Dockerfile
+|-- Dockerfile.fastapi
+|-- Dockerfile.streamlit
+|-- docker-compose.yml
 |-- Makefile
 |-- README.md
 ```
@@ -83,7 +85,9 @@ The `fastapi_app.py`  contains the FastApi app code.
 
 The `streamlit_app.py` contains the streamlit app code.
 
-The `Dockerfile` contains the Dockerfile used to build the Docker image for the project.
+The `Dockerfile.streamlit` and `Dockerfile.compose` contains the Dockerfiles used to build the Docker images for the streamlit app and the FastApi app.
+
+The `docker-compose.yml` is the configuration file used by Docker Compose to define and manage the streamlit and fastapi containers
 
 The `Makefile` contains the instructions to run the project.
 
@@ -145,7 +149,14 @@ To implement the project, first clone the repo and navigate to this branch. Then
     pip install streamlit fastapi
     ```
 
-3. Start the FastAPI and Streamlit applications
+3. In the `config.yaml` file in the `configs` folder, change the `endpoint_url` under `streamlit_app` to `"http://localhost:8000/invoke"`.
+
+     ```yaml
+    streamlit_app:
+        endpoint_url: "http://localhost:8000/invoke"
+    ```
+
+4. Start the FastAPI and Streamlit applications
 
     - In one start the fastapi server:
 
@@ -159,23 +170,32 @@ To implement the project, first clone the repo and navigate to this branch. Then
       poetry run streamlit run streamlit_app.py
       ```
 
-4. Access the applications via the urls provided once the startup is complete.
+5. Access the applications via the urls provided once the startup is complete.
 
-5. Upload product image and product description via the streamlit app  and view results.
+6. Upload product image and product description via the streamlit app  and view results.
 
 ### Option 2: With Docker
 
 1. Create a .env file in the project root directory and populate it with the required API keys and tokens (same as in Option 1).
 
-2. Pull the Docker image from Docker hub:
+2. In the `config.yaml` file in the `configs` folder, change the `endpoint_url` under `streamlit_app` to `"http://fastapi:8000/invoke"`. This allows the Streamlit app to communicate with the FastAPI app running in the Docker container.
 
-     ```bash
-    make pull
+    ```yaml
+    streamlit_app:
+        endpoint_url: "http://fastapi:8000/invoke"
     ```
 
-    The `make pull` command downloads the latest Docker image for the project from the Docker registry.
+3. Change the name `repo` in the `docker-compose.yml` to your own repo name in docker.
 
-3. Run the Docker image:
+4. Build up the Docker images:
+
+     ```bash
+    make build
+    ```
+
+    The `make build` command builds the Docker images for the project.
+
+5. Run the Docker image:
 
     ```bash
     make run
@@ -183,19 +203,20 @@ To implement the project, first clone the repo and navigate to this branch. Then
 
     The `make run` command starts the Docker container and maps the necessary ports for the FastAPI and Streamlit applications.
 
-4. In the `config.yaml` file in the `configs` folder, change the `endpoint_url` under `streamlit_app` to `"http://localhost:8000"`. This allows the Streamlit app to communicate with the FastAPI app running in the Docker container.
 
-    ```yaml
-    streamlit_app:
-        endpoint_url: "http://localhost:8000"
-    ```
-
-5. Access the applications:
+6. Access the applications:
     - FastAPI app: <http://localhost:8000>
 
     - Streamlit app: <http://localhost:8501>
 
-6. Upload product image and product description via the streamlit app and view results.
+7. Upload product image and product description via the streamlit app and view results.
+
+8. Clean up after.
+    ```bash
+    make stop
+
+    make clean
+    ```
 
 ## Getting Help
 

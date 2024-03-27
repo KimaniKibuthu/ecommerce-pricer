@@ -1,13 +1,23 @@
 """
 Contains the utility functions for the project
 """
-import yaml
 import logging
+import os
 
+import yaml
+
+log_dir = "logs"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Configure logger
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("logs/logs.log")],
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(os.path.join(log_dir, "logs.log")),
+    ],
 )
 
 logger = logging.getLogger(__name__)

@@ -2,13 +2,15 @@
 Contains the Streamlit app
 """
 
-import streamlit as st
-import PIL
-import base64
 import asyncio
-import aiohttp
+import base64
 import random
 import re
+
+import aiohttp
+import streamlit as st
+from PIL import Image
+
 from src.utils import load_config
 
 config = load_config()
@@ -71,7 +73,7 @@ def main() -> None:
 
     if uploaded_image and user_text:
         with st.container(height=350):
-            image = PIL.Image.open(uploaded_image)
+            image = Image.open(uploaded_image)
             st.image(image, caption=user_text, use_column_width=True)
 
     # Button to trigger response generation

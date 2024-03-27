@@ -2,22 +2,23 @@
 Contains the FastAPI app
 """
 
-import os
-import json
 import base64
-import uvicorn
-from PIL import Image
+import json
+import os
 from io import BytesIO
+
+import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from langchain_core.messages import HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import JsonOutputParser
-from src.utils import logger, load_config
+from langchain_google_genai import ChatGoogleGenerativeAI
+from PIL import Image
+
 from src.agents import Agent
 from src.prompts import prompt_template
 from src.tools import tools
-from dotenv import load_dotenv
-
+from src.utils import load_config, logger
 
 # Load configuration and environment variables
 config = load_config()
@@ -53,6 +54,13 @@ gemini_vision = ChatGoogleGenerativeAI(
 parser = JsonOutputParser()
 
 # Set up endpoint
+@app.get("/")
+async def read_root():
+    return {
+        "message": "Welcome to the Price Discovery API! Go to the homepage at http://localhost:8000/docs"
+    }
+
+
 @app.post("/invoke")
 async def generate_price_range(request: Request) -> dict:
     """
