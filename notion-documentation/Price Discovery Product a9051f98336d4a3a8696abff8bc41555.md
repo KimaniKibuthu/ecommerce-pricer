@@ -66,6 +66,8 @@ Vector Database was implemented into the AI Agent. The description of a product 
 
 Its implementation can be found in the `agents_notebooks` branch within `fellowship/price-discovery/notebooks` GitHub repository. There is an `Agents.ipynb` notebook with code implementations.
 
+Vector Database was also implemented into the LLM of the RAG architectural model. The product description was given to the LLM in a similar way as to the agents, whereby the LLM searches for similar products in the database and if not found, then moves to Google Search. The implementation is found in the `RAG-Complete-Open-clip-vit-b-32-chroma.ipynb` notebook within the `rag_notebooks`  branch
+
 **3.2.4 Results**
 When the agent’s performance is compared with and without the database search, the price range of the product with the database search is narrower than without. Both with and without gave price ranges that included the true price.
 
@@ -98,7 +100,7 @@ By representing products, categories, brands, attributes, and price ranges as no
 
 ## 4.1 CLIP + Statistical Model
 
-CLIP is a pre-trained model for telling you how well a given image and a given text caption fit together introduced by OpenAI. It was ***trained*** ***contrastively*** on about 400 million web-scraped data of image-caption pairs. There are four different CLIP models: a ViT-B/32, a ViT-B/16,  a ViT-L/14, and a ViT-L/14@336px. We used the ViT-B/32, and the ViT-L/14 in this project, corresponding code can be found at notebooks/clip_notebooks/proce_discovery_CLIP-vit_large-stylish products.ipynb, and notebooks/clip_notebooks/Price_Discovery_CLIP-vit-base-patch32.ipynb
+CLIP is a pre-trained model for telling you how well a given image and a given text caption fit together introduced by OpenAI. It was ***trained*** ***contrastively*** on about 400 million web-scraped data of image-caption pairs. There are four different CLIP models: a ViT-B/32, a ViT-B/16,  a ViT-L/14, and a ViT-L/14@336px. We used the ViT-B/32, and the ViT-L/14 in this project, corresponding code can be found at notebooks/clip_notebooks/price_discovery_CLIP-vit_large-stylish products.ipynb, and notebooks/clip_notebooks/Price_Discovery_CLIP-vit-base-patch32.ipynb
 
 ![Screenshot 2024-03-26 at 8.28.13 AM.png](Price%20Discovery%20Product%20a9051f98336d4a3a8696abff8bc41555/Screenshot_2024-03-26_at_8.28.13_AM.png)
 
@@ -121,26 +123,25 @@ LLMs, or Large Language Models, are a crucial artificial intelligence technology
 
 ### **4.2.2 Steps Involved In RAG**
 
-- Create external data:
-    - The new data that is not part of the LLM's original training data set is referred to as external data. The external data we have exists in the form of a vector database on Qdrant. The embedding language models convert data into numerical representations and store it in the vector database. This process creates a knowledge library that the generative AI models can understand.
-- Retrieve relevant information
-    - The next step involves performing a relevancy search by converting the user query into a vector representation and matching it with the vector databases.
-- Augment the LLM prompt
-    - The RAG model enhances user input by incorporating relevant retrieved data to provide context. This step utilizes prompt engineering techniques to effectively communicate with the LLM. By augmenting the prompt, large language models can generate accurate price ranges in response to user queries.
+- **Create external data**:
+    - The new data that is not part of the LLM's original training data set is referred to as external data. The external data we have exists in the form of a vector database on Qdrant which is encoded from the Amazon Product Dataset 2023. The embedding language models convert data into numerical representations and store it in the vector database. This process creates a knowledge library that the generative AI models can understand. Currently, we have 50,000 records of text and image embeddings on the vector database.
+- **Retrieve relevant information**
+    - The next step involves performing a semantic search by converting the user query into a vector representation and matching it with the vector databases. The text/image query was encoded using the same embedding function used during the database creation.
+- **Augment the LLM prompt**
+    - The RAG model enhances user input by incorporating relevant retrieved data to provide context. This step requires prompt engineering techniques for effective communication with the LLM. By augmenting the prompt, the large language model was able to generate accurate price ranges in response to the user queries.
 
-### **4.2.3 WorkFlow Overview**
+### **4.2.3 Workflow Overview**
 
 ![Screenshot 2024-03-26 at 8.27.59 AM.png](Price%20Discovery%20Product%20a9051f98336d4a3a8696abff8bc41555/Screenshot_2024-03-26_at_8.27.59_AM.png)
 
-- A query is made.
-- The query is passed to the RAG LLM model which is the Vit-B-32, pretrained = ‘openai’ from Open-CLIP.
-- The RAG model encodes the query into text and image embeddings, which are then compared to a vector database of information. The query can be passed into the vector database in any one of the two ways:
+- Input Acquisition: An input query was made in the form of a text description and image URL
+- The query is passed to the LLM (model=” Vit-B-32”, pretrained = ‘openai’) from Open-CLIP.
+- The RAG model encodes the query into text and image embeddings, which are then passed into the vector database using any one of the following two ways:
     - First, only the text query is encoded and compared with the vector database.
-    - Second, for a more precise result, a new description is generated from the text query and image query analysis using a VLLM. In this case, Gemini pro-vision was used.
-- The RAG’s retriever decides the most relevant information with its semantic search abilities.
-- The RAG’s retriever sends the parsed embeddings to the generator.
-- The generator combines the embeddings with the original query to provide context.
-- The generator delegates its task to the language model to generate the output for the user.
+    - Second, a new enriched description is generated from the queried text and image analysis using a VLLM for a more precise result. In this case, Gemini pro-vision was used as the VLLM.
+- The retriever decides the most relevant product using semantic search abilities within the database. If a similar product is not found, it searches the internet and gets the information. It then sends the parsed embeddings to the generator.
+- The generator combines the embeddings with the original query to provide context and then delegates its task to the language model to generate the most relevant output for the user. The LLMs we experimented with here are Microsoft Phi2, Gemini and Mixtral.
+- Result Analysis: The model produced fairly good results with most products, but with certain other products not in the database, results were a little amiss. Furthermore, inconsistencies in the price range were seen for the same product. Results were based on the preciseness of the input description, a generalized description gave a generalized price range whereas an accurate description resulted in an accurate price range. More complex prompt engineering techniques and ways to acquire unambiguous text descriptions are required for decent results.
 
 ## 4.3 Agents
 
@@ -550,8 +551,6 @@ Prompt Circle AI. (2024, February 9). *Introduction to LangGraph | Building an A
 *podcast* [Video]. YouTube. https://www.youtube.com/watch?v=Al6Dkhuw3z0
 
 *QDrant | ️🔗 Langchain*. (n.d.-a). https://python.langchain.com/docs/integrations/vectorstores/qdrant
-
-*QDrant | ️🔗 Langchain*. (n.d.-b). https://python.langchain.com/docs/integrations/vectorstores/qdrant
 
 Rustamy, F., PhD. (2024, March 18). CLIP model and the importance of multimodal embeddings. *Medium*. https://towardsdatascience.com/clip-model-and-the-importance-of-multimodal-embeddings-1c8f6b13bf72
 
