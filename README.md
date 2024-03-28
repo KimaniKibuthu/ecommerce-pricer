@@ -23,6 +23,12 @@ For more information, see the [documentation](https://github.com/fellowship/pric
 ## Directory Structure
 
 ```plaintext
+
+|-- appendix
+    |-- clip_notebooks
+    |-- data_preparation_notebooks
+    |-- rag_notebooks
+
 |-- configs
     |-- __init__.py
     |-- config.yaml
@@ -36,9 +42,8 @@ For more information, see the [documentation](https://github.com/fellowship/pric
 
 |-- notebooks
     |-- agents_notebooks
-    |-- clip_notebooks
-    |-- data_preparation_notebooks
-    |-- rag_notebooks
+        |-- agents.ipynb
+        |-- evaluation_notebooks
 
 |-- src
     |-- __init__.py
@@ -68,13 +73,11 @@ For more information, see the [documentation](https://github.com/fellowship/pric
 
 NOTE: The `data` folder will not be present in the repo. The structure above showcases the structure of the data folder used during experimentation.
 
-The `notebooks` directory houses the notebooks utilized for experimentation with the agents and throughout the project's development. It comprises several subdirectories:
+The `appendix` folder cotntains other notebooks used for experimentation on various architectures throughout the project.
 
-- The `agents_notebooks` directory holds notebooks essential for constructing and assessing the agent. Here resides the core code of the project. The `agents.ipynb` notebook encompasses the code responsible for building the agent, while `evaluation_metrics.ipynb` hosts the code for evaluating the agent's performance.
+The `notebooks` directory houses the main notebooks utilized for experimentation with the agents and throughout the project's development. It comprises several subdirectories:
 
-- The `clip_notebooks` directory contains notebooks dedicated to experimentation with CLIP.
-
-- The `rag_notebooks` directory houses notebooks utilized for experimentation with RAG.
+- The `agents_notebooks` directory holds notebooks essential for constructing and assessing the agent. Here resides the core code of the project. The `agents.ipynb` notebook encompasses the main code responsible for building the agent, while `evaluation_notebooks` folder hosts the code showcasing evaluating the agent's performance.
 
 The `notion-documentation` folder contains the documentation of the project.
 
@@ -105,14 +108,14 @@ You can request access to a pre-existing remote database by contacting our [coll
 **Option 2: Creating a Local Database**
 To create your own local database, follow the instructions in the `agents.ipynb` notebook:
 
-1. You can use the preprocessed datasets of size 20k or 50k which can be found [here](https://drive.google.com/drive/folders/17C-s4r774ons6z3CtCDsh8jH47p4_4PK?usp=sharing). It contains the text data which is csv format as well as the extracted images. You can then load the data into the database as shown on the notebook.
+1. You can use the preprocessed datasets of size 20k or 50k which can be found [here](https://drive.google.com/drive/folders/17C-s4r774ons6z3CtCDsh8jH47p4_4PK?usp=sharing). It contains the text data which is csv format as well as the extracted images. Save the data in a data folder and follow the steps as shown on the notebook.
 
 2. (Optional)
 
     - Get the original data from: [Amazon Products Dataset 2023 (1.4M Products)](https://www.kaggle.com/datasets/asaniczka/amazon-products-dataset-2023-1-4m-products?select=amazon_products.csv)
     - There are two csv files in the dataset: amazon_products.csv (the main dataset) and amazon_categories.csv (description of each categories)
     - Download both files into your local machine
-    - Prepare the data using the data preparation script `get_apparel_data.ipynb` which can be found in the `data_preparation_notebooks` folder.
+    - Prepare the data using the data preparation script `get_apparel_data.ipynb` which can be found in the `data_preparation_notebooks` folderm in the appendix.
 
     - This script first filter a particular number of products from each specified category from the main dataset. In this case, the script is choosing 5000 products from each of the ten apparel category, which results in sample dataset of 50000 products.
     - Then the image of each product is downloaded (it will take a long time, so downloading them in batch may be useful)
@@ -135,14 +138,15 @@ To implement the project, first clone the repo and navigate to this branch. Then
     HUGGINGFACEHUB_API_TOKEN="your_huggingfacehub_api_token"
     GOOGLE_API_KEY="your_google_api_key"
     SERPAPI_API_KEY="your_serpapi_api_key"
-    VECTORSTORE_API_KEY="your_vectorstore_api_key"
+    (OPTIONAL) VECTORSTORE_API_KEY="your_vectorstore_api_key"
     ```
 
-    - For the vectorstore api key, request for access as stipulated in the data implementation section.
-    - For the langchain API key, check [here](https://docs.smith.langchain.com/setup)
-    - For the huggingface API key, check [here](https://huggingface.co/docs/api-inference/en/quicktour#get-your-api-token)
-    - For the google API key check [here](https://aistudio.google.com/app/prompts/new_chat/?utm_source=agd&utm_medium=referral&utm_campaign=core-cta&utm_content=)
-    - For the serp API key check [here](https://serpapi.com/)
+    - For the vectorstore api key, request for access as stipulated in the data implementation section. Unless you opt to go for the local database, you won't need it.
+    - For the langchain API key, check [here](https://docs.smith.langchain.com/setup). This will be used for monitoring on langsmith.
+    - For the huggingface API key, check [here](https://huggingface.co/docs/api-inference/en/quicktour#get-your-api-token). This will be used for Mistral.
+    - For the google API key check [here](https://aistudio.google.com/app/prompts/new_chat/?utm_source=agd&utm_medium=referral&utm_campaign=core-cta&utm_content=). This will be used for Gemini.
+    - For the serp API key check [here](https://serpapi.com/). This will be used for creating a search tool.
+
 
 2. Install Poetry and set up the project dependencies:
 
@@ -154,14 +158,19 @@ To implement the project, first clone the repo and navigate to this branch. Then
     pip install streamlit fastapi
     ```
 
-3. In the `config.yaml` file in the `configs` folder, change the `endpoint_url` under `streamlit_app` to `"http://localhost:8000/invoke"`.
+3. In the case that you opt to create a local database, follow the steps on the `agents.ipynb` to create the notebook, and make sure everything runs seamlessly. Also, change the following in the config file:
+    ```yaml
+    is_remote: False
+    ```
+
+4. In the `config.yaml` file in the `configs` folder, change the `endpoint_url` under `streamlit_app` to `"http://localhost:8000/invoke"`.
 
      ```yaml
     streamlit_app:
         endpoint_url: "http://localhost:8000/invoke"
     ```
 
-4. Start the FastAPI and Streamlit applications
+5. Start the FastAPI and Streamlit applications
 
     - In one start the fastapi server:
 
@@ -175,9 +184,11 @@ To implement the project, first clone the repo and navigate to this branch. Then
       poetry run streamlit run streamlit_app.py
       ```
 
-5. Access the applications via the urls provided once the startup is complete.
+6. Access the applications via the urls provided once the startup is complete.
 
-6. Upload product image and product description via the streamlit app  and view results.
+7. Upload product image and product description via the streamlit app  and view results.
+
+
 
 ### Option 2: With Docker
 
@@ -225,4 +236,4 @@ To implement the project, first clone the repo and navigate to this branch. Then
 
 ## Getting Help
 
-For inquiries, please refer to `HELP.md`
+For inquiries, please refer to `GETTINGHELP.md`
