@@ -12,7 +12,7 @@ Here's how it works: Users input a product image and its description into the St
 
 Next, this enhanced description is passed to an agent equipped with three tools: searching the internet, searching image databases, and searching text databases. The agent conducts these searches to identify similar products and then determines a price range based on its findings and comparison to similar products. Once completed, the agent returns the price range along with the rationale behind it to the user.
 
-For more information, see the [documentation](https://www.notion.so/Price-Discovery-Product-a9051f98336d4a3a8696abff8bc41555)
+For more information, see the [documentation](https://github.com/fellowship/price-discovery/tree/main/notion-documentation)
 
 ## Prerequisites
 
@@ -52,6 +52,8 @@ For more information, see the [documentation](https://www.notion.so/Price-Discov
     |-- headphones.jpg
     |-- README_images
 
+|-- notion-documentation
+|-- demo-session
 |-- poetry.lock
 |-- .pre-commit-config.yaml
 |-- pyproject.toml
@@ -74,6 +76,9 @@ The `notebooks` directory houses the notebooks utilized for experimentation with
 
 - The `rag_notebooks` directory houses notebooks utilized for experimentation with RAG.
 
+The `notion-documentation` folder contains the documentation of the project.
+
+The `demo-session folder` contains the presentations made on the project.
 
 The `configs` folder contains the `config.yaml` file wich contains the configuration settings.
 

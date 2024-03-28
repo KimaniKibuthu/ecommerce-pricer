@@ -1,5 +1,5 @@
 vector_database:
-    embedding_model_name: "ViT-B-16"
+    embedding_model_name: "ViT-B-32"
     embedding_model_checkpoint: "openai"
     db_directory: "db"
     existing_text_db_directory: "data/databases/clip_textdb"
@@ -18,4 +18,4 @@ fastapi:
     port: 8000
 
 streamlit_app:
-    endpoint_url: "http://fastapi:8000/invoke"
+    endpoint_url: "http://localhost:8000/invoke"
