@@ -34,9 +34,7 @@ For more information, see the [documentation](https://github.com/fellowship/pric
     |-- config.yaml
 
 |-- data
-    |-- databases
-        |-- text_db
-        |-- image_db
+    |-- db
     |-- images
     |-- text_data
 
