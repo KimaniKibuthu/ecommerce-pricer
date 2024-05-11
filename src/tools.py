@@ -84,8 +84,8 @@ if config["vector_database"]["is_remote"] == False:
     # List of all tools
     tools: List[Tool] = [
         tool_search_item,
-        tool_retrieve_from_text_db,
-        tool_retrieve_from_image_db,
+        #tool_retrieve_from_text_db,
+        #tool_retrieve_from_image_db,
     ]
 
 else:
@@ -158,6 +158,6 @@ else:
     )
 
     # List of all tools
-    tools: List[Tool] = [tool_search_item, tool_image_retriever, tool_text_retriever]
+    tools: List[Tool] = [tool_search_item]
 
 logger.info("Setup completed successfully.")

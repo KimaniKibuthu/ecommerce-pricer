@@ -6,6 +6,10 @@ data
 # C extensions
 *.so
 # Folders in project
+notion-documentation
+appendix/
+notebooks/
+demo-session/
 mlartifacts/
 mlruns/
 data/images
